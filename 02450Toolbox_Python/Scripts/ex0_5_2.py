@@ -47,7 +47,7 @@ plt.ylabel('Voltage [mV]')
 plt.title('Sensor outputs')
 
 # Export the figure
-plt.savefig('ex1_5_2.png')
+plt.savefig('ex0_5_2.png')
 
 # Show the figure in the console
 plt.show()
