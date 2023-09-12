@@ -34,7 +34,7 @@ vectorizer = CountVectorizer(token_pattern=r'\b[^\d\W]+\b')
 vectorizer.fit(corpus)
 # The vectorizer has now determined the unique terms (or tokens) in the corpus
 # and we can extract them using:
-attributeNames = vectorizer.get_feature_names()
+attributeNames = vectorizer.get_feature_names_out()
 print('Found terms:')
 print(attributeNames)
 print()
