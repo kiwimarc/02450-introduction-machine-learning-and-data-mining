@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.linalg import svd
 
 # Read the data file line by line
 with open('Data/ecoli.data', 'r') as file:
