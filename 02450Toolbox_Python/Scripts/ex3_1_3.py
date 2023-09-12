@@ -19,7 +19,7 @@ vectorizer = CountVectorizer(token_pattern=r'\b[^\d\W]+\b',
 vectorizer.fit(corpus)
 # ... and count the frequency of each term within a document:
 X = vectorizer.transform(corpus)
-attributeNames = vectorizer.get_feature_names()
+attributeNames = vectorizer.get_feature_names_out()
 N,M = X.shape
 
 # Display the result

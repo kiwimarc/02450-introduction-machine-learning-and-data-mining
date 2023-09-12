@@ -32,7 +32,7 @@ vectorizer = CountVectorizer(analyzer=stemmed_words)
 
 # Determine the terms:
 vectorizer.fit(corpus)
-attributeNames = vectorizer.get_feature_names()
+attributeNames = vectorizer.get_feature_names_out()
 
 # ... and count the occurences:
 X = vectorizer.transform(corpus)
