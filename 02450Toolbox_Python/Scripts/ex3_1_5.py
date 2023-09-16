@@ -1,7 +1,7 @@
 # exercise 3.1.5
 import numpy as np
 import scipy.linalg as linalg
-from toolbox_02450.similarity import similarity
+from Tools.toolbox_02450.similarity import similarity
 
 from ex3_1_4 import *
 
