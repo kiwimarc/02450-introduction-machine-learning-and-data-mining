@@ -62,7 +62,7 @@ C = len(classNames)
 Y = X - np.ones((N,1))*X.mean(axis=0)
 
 # PCA by computing SVD of Y
-U,S,V = svd(X,full_matrices=False)
+U,S,Vh = svd(Y,full_matrices=False)
 
 # Compute variance explained by principal components
 rho = (S*S) / (S*S).sum() 
@@ -70,7 +70,7 @@ rho = (S*S) / (S*S).sum()
 threshold = 0.9
 
 # Plot variance explained
-plt.figure()
+plt.figure(1)
 plt.plot(range(1,len(rho)+1),rho,'x-')
 plt.plot(range(1,len(rho)+1),np.cumsum(rho),'o-')
 plt.plot([1,len(rho)],[threshold, threshold],'k--')
@@ -79,4 +79,60 @@ plt.xlabel('Principal component');
 plt.ylabel('Variance explained');
 plt.legend(['Individual','Cumulative','Threshold'])
 plt.grid()
+
+# scipy.linalg.svd returns "Vh", which is the Hermitian (transpose)
+# of the vector V. So, for us to obtain the correct V, we transpose:
+V = Vh.T
+
+# Project the centered data onto principal component space
+Z = Y @ V
+
+# Indices of the principal components to be plotted
+i = 0
+j = 1
+plt.figure(2)
+for c in range(C):
+    # select indices belonging to class c:
+    class_mask = y==c
+    plt.plot(Z[class_mask,i], Z[class_mask,j], 'o', alpha=.5)
+plt.title('Ecoli data: PCA')
+plt.xlabel('PC{0}'.format(i+1))
+plt.ylabel('PC{0}'.format(j+1))
+plt.legend(classNames)
+plt.grid()
+
+# The first 4 principals components explains more than 90 percent of
+# variance.
+pcs = [0,1,2]
+legendStrs = ['PC'+str(e+1) for e in pcs]
+c = ['r','g','b'] #['r','g','b', 'o']
+bw = .2
+r = np.arange(1,M+1)
+plt.figure(3)
+for i in pcs:
+    plt.bar(r+i*bw, V[:,i], width=bw)
+
+    # ######### Experimental part #########
+    # for bar, val in enumerate(V[:,i]):
+    #     plt.text(bar, round(val, 3), str(round(val, 3)), ha='center', va='bottom')
+
+    # # Calculate square of every coefficent for each analized PCA
+    # V_sq = np.dot(V[:,i], V[:,i])
+    # V_sq_sum = np.sum(V_sq)
+    # print(V_sq_sum)
+    # ######### Experimental part #########
+
+plt.xticks(r+bw, attributeNames)
+plt.title('Ecoli: PCA Component Coefficients')
+plt.xlabel('Attributes')
+plt.ylabel('Component coefficients')
+plt.legend(legendStrs)
+plt.grid()
+
+print(V[:,0]) # PC1.
+print(V[:,1]) # PC2.
+print(Y[0,:]) # First observation in dataset.
+print(f"Projection onto PC1: {V[:,0]@Y[0,:]}")    # Project obervation onto PC1.
+print(f"Projection onto PC2: {V[:,1]@Y[0,:]}")    # Project obervation onto PC2.
+
 plt.show()
