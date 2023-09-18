@@ -3,11 +3,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import svd
 
+# If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
+# this variable may come in handy.
+SHOW_PLOTS = False
+
 #####################
 #                   #
 #    Data import    #
 #                   #
 #####################
+
+print("\n##### DATA IMPORT #####\n")
 
 # Read the data file line by line
 with open('Data/ecoli.data', 'r') as file:
@@ -57,6 +63,7 @@ C = len(classNames)
 #                     #
 #######################
 
+print("\n##### PCA #####\n")
 
 # Subtract mean value from data
 Y = X - np.ones((N,1))*X.mean(axis=0)
@@ -74,9 +81,9 @@ plt.figure(1)
 plt.plot(range(1,len(rho)+1),rho,'x-')
 plt.plot(range(1,len(rho)+1),np.cumsum(rho),'o-')
 plt.plot([1,len(rho)],[threshold, threshold],'k--')
-plt.title('Variance explained by principal components');
-plt.xlabel('Principal component');
-plt.ylabel('Variance explained');
+plt.title('Variance explained by principal components')
+plt.xlabel('Principal component')
+plt.ylabel('Variance explained')
 plt.legend(['Individual','Cumulative','Threshold'])
 plt.grid()
 
@@ -135,4 +142,32 @@ print(Y[0,:]) # First observation in dataset.
 print(f"Projection onto PC1: {V[:,0]@Y[0,:]}")    # Project obervation onto PC1.
 print(f"Projection onto PC2: {V[:,1]@Y[0,:]}")    # Project obervation onto PC2.
 
-plt.show()
+if SHOW_PLOTS:
+    plt.show()
+
+
+##################################
+#                                #
+#    Basic summary statistics    #
+#                                #
+##################################
+
+print("\n##### BASIC SUMMARY STATISTICS #####\n")
+
+# Calculate the empirical mean, sandard deviation, median and range
+# for every attribute (before substracting mean value from the data):
+
+print("Statistics for each attribute before substracting mean value from the data.")
+for idx, name in enumerate(df.columns[1:-1]): # These are the attributes names.
+    x = X[:,idx] # Take the whole column (all data from certain feature)
+    mean_x = x.mean()
+    std_x = x.std(ddof=1)
+    median_x = np.median(x)
+    range_x = x.max()-x.min()
+
+    # Display results
+    print(f"Statistics for attribute: {name}")
+    print('\tMean:',mean_x)
+    print('\tStandard Deviation:',std_x)
+    print('\tMedian:',median_x)
+    print('\tRange:',range_x)
