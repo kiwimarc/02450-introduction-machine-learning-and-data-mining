@@ -110,7 +110,7 @@ plt.grid()
 
 # The first 4 principals components explains more than 90 percent of
 # variance.
-pcs = [0,1,2]
+pcs = [0,1,2,3]
 legendStrs = ['PC'+str(e+1) for e in pcs]
 c = ['r','g','b'] #['r','g','b', 'o']
 bw = .2
