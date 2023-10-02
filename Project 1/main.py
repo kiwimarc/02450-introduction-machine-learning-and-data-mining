@@ -165,8 +165,35 @@ for idx, name in enumerate(df.columns[1:-1]): # These are the attributes names.
     median_x = np.median(x)
     range_x = x.max()-x.min()
 
+    # Determine attribute type based on criteria
+    if  name is 'lip':
+        attribute_type = "Binary (takes only values of 0.48 and 1)"
+    elif  name is 'chg':
+        attribute_type = "Binary (takes only values of 0.5 and 1)"
+    elif std_x == 0:
+        # If standard deviation is 0, it's a constant attribute (not useful for modeling)
+        attribute_type = "Constant"
+    elif range_x == 0:
+        # If the range is 0, it's a discrete attribute (all values are the same)
+        attribute_type = "Discrete"
+    elif np.isnan(mean_x) or np.isnan(std_x) or np.isnan(median_x):
+        # If there are missing values in summary statistics, note it as a data issue
+        attribute_type = ">> Data Issue: Missing Values <<"
+    elif std_x < 1:
+        # If the standard deviation is very small, it's likely a discrete attribute
+        attribute_type = "Discrete"
+    elif np.abs(mean_x - median_x) < 1e-5:
+        # If mean and median are very close, it's likely a discrete attribute
+        attribute_type = "Discrete"
+    else:
+        # By default, consider attribite as a continuous attribute
+        attribute_type = "Continuous"
+
+   
+
     # Display results
     print(f"Statistics for attribute: {name}")
+    print(f"\tType: {attribute_type}")
     print('\tMean:',mean_x)
     print('\tStandard Deviation:',std_x)
     print('\tMedian:',median_x)
