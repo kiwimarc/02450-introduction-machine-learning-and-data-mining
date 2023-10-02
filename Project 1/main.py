@@ -1,3 +1,15 @@
+
+##############################################
+#                                            #
+# This code was created as part of Project 1 #
+# within Introduction to Machine Learning    #
+# course at the Technical University of      #
+# Denmark. The following code is based on    #
+# the code provided in Toolbox, which is the #
+# integral part of the mentioned course.     #
+#                                            #
+##############################################
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
