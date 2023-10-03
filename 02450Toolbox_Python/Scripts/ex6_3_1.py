@@ -3,8 +3,8 @@
 from matplotlib.pyplot import (figure, plot, title, xlabel, ylabel, 
                                colorbar, imshow, xticks, yticks, show)
 from scipy.io import loadmat
-from sklearn.neighbors import KNeighborsClassifier, DistanceMetric
-from sklearn.metrics import confusion_matrix
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix, DistanceMetric
 from numpy import cov
 
 # Load Matlab data file and extract variables of interest
