@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import svd
+from sklearn.preprocessing import StandardScaler
 
 # If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
 # this variable may come in handy.
@@ -10,7 +11,7 @@ SHOW_PLOTS = False
 
 #################################
 #                               #
-#          Project 1            #
+#          Project 2            #
 #                               #
 #################################
 
@@ -65,3 +66,38 @@ N, M = X.shape
 # Number of classes
 C = len(classNames)
 
+
+# Check X matrix stats before feature transformation
+for idx, name in enumerate(df.columns[1:-1]): # These are the attributes names.
+    x = X[:,idx] # Take the whole column (all data from certain feature)
+    mean_x = x.mean()
+    std_x = x.std(ddof=1)
+    median_x = np.median(x)
+    range_x = x.max()-x.min()
+    
+    # print(f"Statistics for attribute: {name}")
+    # print('\tMean:',mean_x)
+    # print('\tStandard Deviation:',std_x)
+    # print('\tMedian:',median_x)
+    # print('\tRange:',range_x)
+
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+# print("\n\n ############# \n \
+# AFTER SCALING \n \
+# ############# \n \n")
+
+# Check X matrix stats after feature transformation
+for idx, name in enumerate(df.columns[1:-1]): # These are the attributes names.
+    x = X[:,idx] # Take the whole column (all data from certain feature)
+    mean_x = x.mean()
+    std_x = x.std(ddof=1)
+    median_x = np.median(x)
+    range_x = x.max()-x.min()
+    
+    # print(f"Statistics for attribute: {name}")
+    # print('\tMean:',mean_x)
+    # print('\tStandard Deviation:',std_x)
+    # print('\tMedian:',median_x)
+    # print('\tRange:',range_x)
