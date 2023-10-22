@@ -64,3 +64,4 @@ N, M = X.shape
 
 # Number of classes
 C = len(classNames)
+
