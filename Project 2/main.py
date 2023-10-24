@@ -66,6 +66,11 @@ N, M = X.shape
 # Number of classes
 C = len(classNames)
 
+#####################
+#                   #
+# Regression part a #
+#                   #
+#####################
 
 # Check X matrix stats before feature transformation
 for idx, name in enumerate(df.columns[1:-1]): # These are the attributes names.
@@ -101,3 +106,15 @@ for idx, name in enumerate(df.columns[1:-1]): # These are the attributes names.
     # print('\tStandard Deviation:',std_x)
     # print('\tMedian:',median_x)
     # print('\tRange:',range_x)
+
+#####################
+#                   #
+# Regression part b #
+#                   #
+#####################
+
+#####################
+#                   #
+#  Classification   #
+#                   #
+#####################
