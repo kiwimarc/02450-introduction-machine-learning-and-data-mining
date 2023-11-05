@@ -1,4 +1,5 @@
 # exercise 8.3.3 Fit regularized multinomial regression
+import __init__
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
 from toolbox_02450 import dbplotf, train_neural_net, visualize_decision_boundary
@@ -18,6 +19,7 @@ attributeNames = [name[0] for name in mat_data['attributeNames'].squeeze()]
 classNames = [name[0][0] for name in mat_data['classNames']]
 
 N, M = X.shape
+print(M)
 C = len(classNames)
 
 #%% Model fitting and prediction
@@ -52,6 +54,6 @@ print('Error rate: \n\t {0} % out of {1}'.format(test_error_rate*100,len(y_test)
 plt.figure(2, figsize=(9,9))
 plt.hist([y_train, y_test, y_test_est], color=['red','green','blue'], density=True)
 plt.legend(['Training labels','Test labels','Estimated test labels'])
-
+plt.show()
 
 print('Ran Exercise 8.3.2')

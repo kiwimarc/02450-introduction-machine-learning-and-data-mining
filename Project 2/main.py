@@ -7,10 +7,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression
-
+import toolbox_02450
 # If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
 # this variable may come in handy.
-SHOW_PLOTS = False
+SHOW_PLOTS = True
 
 #################################
 #                               #
@@ -157,14 +157,9 @@ data_test_est = logreg.predict(data_test)
 test_error_rate = np.sum(data_test_est!=label_test) / len(label_test)
 
 predict = lambda x: np.argmax(logreg.predict_proba(x),1)
-plt.figure(2,figsize=(9,9))
-toolbox_02450.visualize_decision_boundary(predict, [data_train, data_test], [label_train, label_test], attributeNames, classNames)
-plt.title('LogReg decision boundaries')
-plt.show()
-
 
 # Number of miss-classifications
-print('Error rate: \n\t {0} % out of {1}'.format(test_error_rate*100,len(label_test)))
+print('Error rate: {0} % out of {1}'.format(test_error_rate*100,len(label_test)))
 
 # Calculate accuracy to evaluate the baseline model
 logreg_accuracy = accuracy_score(label_test, data_test_est)

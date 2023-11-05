@@ -1,4 +1,5 @@
 # exercise 8.3.2 Fit multinomial regression
+import __init__
 from matplotlib.pyplot import figure, show, title
 from scipy.io import loadmat
 from toolbox_02450 import dbplotf, train_neural_net, visualize_decision_boundary
