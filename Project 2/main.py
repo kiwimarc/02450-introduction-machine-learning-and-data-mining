@@ -5,6 +5,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
+from helper import visualize_decision_boundary
 
 # If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
 # this variable may come in handy.
@@ -124,6 +126,8 @@ print("\n##### CLASSIFICATION #####\n")
 # Split dataset into 70% train og 30% test set
 data_train, data_test, label_train, label_test = train_test_split(X, classLabels, test_size=.30)
 
+## BASELINE ##
+
 # Create a dummy classifier that predicts the most frequent class (majority class)
 dummy_classifier = DummyClassifier(strategy="most_frequent")
 
@@ -137,3 +141,40 @@ dummy_predictions = dummy_classifier.predict(data_test)
 baseline_accuracy = accuracy_score(label_test, dummy_predictions)
 
 print("Baseline Model Accuracy: {:.2f}%".format(baseline_accuracy * 100))
+
+## LOGISTIC REGRESSION ##
+# Standardize the training and set set based on training set mean and std
+mu = np.mean(data_train, 0)
+sigma = np.std(data_train, 0)
+data_train = (data_train - mu) / sigma
+data_test = (data_test - mu) / sigma
+
+# Fit multinomial logistic regression model
+regularization_strength = 1e-3
+logreg = LogisticRegression(solver='lbfgs', multi_class='multinomial', tol=1e-4, random_state=1,
+                            penalty='l2', C=1/regularization_strength)
+logreg.fit(data_train,label_train)
+data_test_est = logreg.predict(data_test)
+test_error_rate = np.sum(data_test_est!=label_test) / len(label_test)
+
+predict = lambda x: np.argmax(logreg.predict_proba(x),1)
+plt.figure(2,figsize=(9,9))
+visualize_decision_boundary(predict, [data_train, data_test], [label_train, label_test], attributeNames, classNames)
+plt.title('LogReg decision boundaries')
+plt.show()
+
+
+# Number of miss-classifications
+print('Error rate: \n\t {0} % out of {1}'.format(test_error_rate*100,len(label_test)))
+
+# Calculate accuracy to evaluate the baseline model
+logreg_accuracy = accuracy_score(label_test, data_test_est)
+
+print("logreg Model Accuracy: {:.2f}%".format(logreg_accuracy * 100))
+
+plt.figure(2, figsize=(9,9))
+plt.hist([label_train, label_test, data_test_est], color=['red','green','blue'], density=True)
+plt.legend(['Training labels','Test labels','Estimated test labels'])
+
+if SHOW_PLOTS:
+    plt.show()

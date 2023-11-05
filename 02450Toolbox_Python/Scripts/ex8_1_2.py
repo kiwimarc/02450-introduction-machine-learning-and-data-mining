@@ -5,7 +5,7 @@ import numpy as np
 from scipy.io import loadmat
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from toolbox_02450 import rocplot, confmatplot
+#from Tools.toolbox_02450 import rocplot, confmatplot
 
 
 font_size = 15
@@ -84,4 +84,4 @@ plt.title('Parameter vector L2 norm')
 plt.grid()
 plt.show()    
 
-print('Ran Exercise 9.1.1')
+print('Ran Exercise 8.1.2')
