@@ -1,3 +1,4 @@
+import __init__
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,12 +7,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression
-from helper import visualize_decision_boundary
 
 # If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
 # this variable may come in handy.
 SHOW_PLOTS = False
-
 
 #################################
 #                               #
@@ -152,14 +151,14 @@ data_test = (data_test - mu) / sigma
 # Fit multinomial logistic regression model
 regularization_strength = 1e-3
 logreg = LogisticRegression(solver='lbfgs', multi_class='multinomial', tol=1e-4, random_state=1,
-                            penalty='l2', C=1/regularization_strength)
+                            penalty='l2', C=1/regularization_strength, max_iter=10^1000)
 logreg.fit(data_train,label_train)
 data_test_est = logreg.predict(data_test)
 test_error_rate = np.sum(data_test_est!=label_test) / len(label_test)
 
 predict = lambda x: np.argmax(logreg.predict_proba(x),1)
 plt.figure(2,figsize=(9,9))
-visualize_decision_boundary(predict, [data_train, data_test], [label_train, label_test], attributeNames, classNames)
+toolbox_02450.visualize_decision_boundary(predict, [data_train, data_test], [label_train, label_test], attributeNames, classNames)
 plt.title('LogReg decision boundaries')
 plt.show()
 
