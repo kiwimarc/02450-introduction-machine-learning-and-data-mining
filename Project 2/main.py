@@ -1,8 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.linalg import svd
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import accuracy_score
 
 # If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
 # this variable may come in handy.
@@ -118,3 +120,20 @@ for idx, name in enumerate(df.columns[1:-1]): # These are the attributes names.
 #  Classification   #
 #                   #
 #####################
+print("\n##### CLASSIFICATION #####\n")
+# Split dataset into 70% train og 30% test set
+data_train, data_test, label_train, label_test = train_test_split(X, classLabels, test_size=.30)
+
+# Create a dummy classifier that predicts the most frequent class (majority class)
+dummy_classifier = DummyClassifier(strategy="most_frequent")
+
+# Fit the model on the training data and labels
+dummy_classifier.fit(data_train, label_train)
+
+# Make predictions on the test data
+dummy_predictions = dummy_classifier.predict(data_test)
+
+# Calculate accuracy to evaluate the baseline model
+baseline_accuracy = accuracy_score(label_test, dummy_predictions)
+
+print("Baseline Model Accuracy: {:.2f}%".format(baseline_accuracy * 100))
