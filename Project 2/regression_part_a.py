@@ -20,7 +20,7 @@ def run(X, df, np, pd, plt):
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
     np.set_printoptions(threshold=np.inf, linewidth=120)
-    print(X)
+    #print(X)
     y = X[:,EL_TO_PREDICT]
     X = np.delete(X, EL_TO_PREDICT, axis=1)
     N, M = X.shape
@@ -135,7 +135,7 @@ def run(X, df, np, pd, plt):
 
         k+=1
         
-    show()
+    #show()
     # Display results
     print('Linear regression without feature selection:')
     print('- Training error: {0}'.format(Error_train.mean()))

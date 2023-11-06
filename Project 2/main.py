@@ -8,7 +8,7 @@ import regression_part_b
 import classification
 # If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
 # this variable may come in handy.
-SHOW_PLOTS = True
+SHOW_PLOTS = False
 
 #################################
 #                               #
