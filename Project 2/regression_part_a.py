@@ -24,7 +24,7 @@ def run(X, df, np, pd, plt):
     y = X[:,EL_TO_PREDICT]
     X = np.delete(X, EL_TO_PREDICT, axis=1)
     N, M = X.shape
-
+    print(y)
     # Extract the attribute names that came from the header
     attributeNames = np.asarray(df.columns[cols])
     attributeNames = attributeNames.tolist()
