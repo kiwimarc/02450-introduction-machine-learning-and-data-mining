@@ -3,16 +3,34 @@ from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression
 import sklearn.linear_model as lm
+from sklearn.preprocessing import StandardScaler
 
 def run(X, df, classLabels, np, pd, plt):
     print("\n##### CLASSIFICATION #####\n")
+    
+    print("\nTransforming X to make the problem binary\n")
+    
+    # make a data copy to not affect original dataset 
+    X_bin = X
+    
+    # Make the mean = 0, std, dev = 1
+    scaler = StandardScaler()
+    X_bin = scaler.fit_transform(X_bin)
+    
+    # Transform labels to make the problem binary
+    #print(classLabels)
+    classLabels = ["cp" if label == "cp" else "not_cp" for label in classLabels]
+    #print(classLabels)
+    
+    
     # Split dataset into 70% train og 30% test set
-    data_train, data_test, label_train, label_test = train_test_split(X, classLabels, test_size=.30)
+    data_train, data_test, label_train, label_test = train_test_split(X_bin, classLabels, test_size=.30)
 
     ## BASELINE ##
     print("\n# Base line #\n")
     # Create a dummy classifier that predicts the most frequent class (majority class)
-    dummy_classifier = DummyClassifier(strategy="most_frequent")
+    #dummy_classifier = DummyClassifier(strategy="most_frequent")
+    dummy_classifier = DummyClassifier(strategy="constant", constant="cp")
 
     # Fit the model on the training data and labels
     dummy_classifier.fit(data_train, label_train)

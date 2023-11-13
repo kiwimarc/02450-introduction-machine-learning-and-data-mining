@@ -6,6 +6,8 @@ import toolbox_02450
 import regression_part_a
 import regression_part_b 
 import classification
+import classification_v2
+
 # If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
 # this variable may come in handy.
 SHOW_PLOTS = False
@@ -73,7 +75,7 @@ C = len(classNames)
 #                   #
 #####################
 
-regression_part_a.run(X_org, df, np, pd, plt)
+#regression_part_a.run(X_org, df, np, pd, plt)
 
 #####################
 #                   #
@@ -81,7 +83,7 @@ regression_part_a.run(X_org, df, np, pd, plt)
 #                   #
 #####################
 
-regression_part_b.run(X_org, df, np, pd, plt)
+#regression_part_b.run(X_org, df, np, pd, plt)
 
 #####################
 #                   #
@@ -89,7 +91,8 @@ regression_part_b.run(X_org, df, np, pd, plt)
 #                   #
 #####################
 
-classification.run(X_org, df, classLabels, np, pd, plt)
+#classification.run(X_org, df, classLabels, np, pd, plt)
+classification_v2.run(X_org, df, classLabels, np, pd, plt)
 
 if SHOW_PLOTS:
     plt.show()
