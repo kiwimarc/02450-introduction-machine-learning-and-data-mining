@@ -1,3 +1,6 @@
+import scipy.stats as st
+import scipy.stats
+
 from sklearn import model_selection
 
 from sklearn.dummy import DummyClassifier
@@ -8,6 +11,45 @@ from sklearn.metrics import accuracy_score, confusion_matrix, DistanceMetric
 from sklearn.preprocessing import StandardScaler
 
 import numpy as np
+
+
+
+def mcnemar(y_true, yhatA, yhatB, alpha=0.05):
+    # perform McNemars test
+    nn = np.zeros((2,2))
+    c1 = yhatA - y_true == 0
+    c2 = yhatB - y_true == 0
+
+    nn[0,0] = sum(c1 & c2)
+    nn[0,1] = sum(c1 & ~c2)
+    nn[1,0] = sum(~c1 & c2)
+    nn[1,1] = sum(~c1 & ~c2)
+
+    n = sum(nn.flat)
+    n12 = nn[0,1]
+    n21 = nn[1,0]
+
+    thetahat = (n12-n21)/n
+    Etheta = thetahat
+
+    Q = n**2 * (n+1) * (Etheta+1) * (1-Etheta) / ( (n*(n12+n21) - (n12-n21)**2) )
+
+    p = (Etheta + 1)*0.5 * (Q-1)
+    q = (1-Etheta)*0.5 * (Q-1)
+
+    CI = tuple(lm * 2 - 1 for lm in scipy.stats.beta.interval(1-alpha, a=p, b=q) )
+
+    p = 2*scipy.stats.binom.cdf(min([n12,n21]), n=n12+n21, p=0.5)
+    print("Result of McNemars test using alpha=", alpha)
+    print("Comparison matrix n")
+    print(nn)
+    if n12+n21 <= 10:
+        print("Warning, n12+n21 is low: n12+n21=",(n12+n21))
+
+    print("Approximate 1-alpha confidence interval of theta: [thetaL,thetaU] = ", CI)
+    print("p-value for two-sided test A and B have same accuracy (exact binomial test): p=", p)
+
+    return thetahat, CI, p
 
 
 
@@ -132,28 +174,35 @@ def get_best_knn_classifier(data_train, label_train, cross_validation_inn, X_bin
 
 
 def run(X, df, classLabels, np, pd, plt):
-    print("\n##### CLASSIFICATION #####\n")
+    print("\n\n###################################")
+    print("##### START OF CLASSIFICATION #####")
+    print("###################################\n")
     
     print("\nTransforming X to make the problem binary\n")
     
     # Make the data copy to not affect original dataset 
-    X_bin = X
+
+    #cols = [1,2,5,6,7]
+    #X_bin = np.asarray(df.values[:, cols])
+    cols = [0,1,4,5,6]
+    X_bin = X[:, cols]
+    X_bin = X_bin.astype(float)
     
+    # print(X_bin)
+    # print("-----------")
+    # print(X)
+
     # Make the mean = 0, std, dev = 1
     scaler = StandardScaler()
     X_bin = scaler.fit_transform(X_bin)
     
     # Transform labels to make the problem binary
     #print(classLabels)
-    classLabels = [1 if label == "cp" else 0 for label in classLabels]
+    classLabels = [1 if label == "im" else 0 for label in classLabels]
     
     # Convert list to the np array for future calculations.
     classLabels = np.array(classLabels)
     #print(classLabels)
-    
-    
-    # Split dataset into 70% train og 30% test set
-    # data_train, data_test, label_train, label_test = model_selection.train_test_split(X_bin, classLabels, test_size=.30)
 
     # Use K = 10 cross-validation
     K = 10
@@ -166,6 +215,16 @@ def run(X, df, classLabels, np, pd, plt):
     dummy_err_avg = 0
     lin_reg_err_avg = 0
     knn_err_avg = 0
+    
+    mcnemar_yhat_baseline = []
+    mcnemar_yhat_linreg = []
+    mcnemar_yhat_knn = []
+    mcnemar_y_test = []
+    
+    yhat_linreg_lambd_10 = []
+
+    avg_weights = np.zeros(5)
+    avg_intercept = np.zeros(1)
 
     fold_no = 1
     print("################ Error rate ################")
@@ -196,11 +255,7 @@ def run(X, df, classLabels, np, pd, plt):
         
         #print("Baseline Model Accuracy: {:.2f}%".format(baseline_accuracy * 100))
 
-        plt.figure(2, figsize=(9,9))
-        plt.hist([label_train, label_test, dummy_y_est], color=['red','green','blue'], density=True)
-        plt.legend(['Training labels','Test labels','Estimated test labels'])
-
-
+        mcnemar_yhat_baseline.append(dummy_y_est)
 
         ###########################################
         ########### LOGISTIC REGRESSION ###########
@@ -226,12 +281,28 @@ def run(X, df, classLabels, np, pd, plt):
         # logreg_accuracy = accuracy_score(label_test, linear_reg_y_est)
         #print("Logistic regression Model Accuracy: {:.2f}%".format(logreg_accuracy * 100))
 
-        plt.figure(2, figsize=(9,9))
-        plt.hist([label_train, label_test, linear_reg_y_est], color=['red','green','blue'], density=True)
-        plt.legend(['Training labels','Test labels','Estimated test labels'])
+        mcnemar_yhat_linreg.append(linear_reg_y_est)
+        
+        
+        logreg_lambda_10 = LogisticRegression(solver='lbfgs', multi_class='multinomial', tol=1e-4, random_state=1,
+                                              penalty='l2', C=1/10, max_iter=10^1000)
+        logreg_lambda_10.fit(data_train,label_train)
 
+        linear_reg_lambd_10_y_est = logreg_lambda_10.predict(data_test)
+        yhat_linreg_lambd_10.append(linear_reg_lambd_10_y_est)
+        #test_error_rate_regr_lambd_10 = np.sum(linear_reg_lambd_10_y_est!=label_test) / len(label_test)
 
+        # Get the learned coefficients (weights)
+        weights = logreg_lambda_10.coef_
+        weights = np.concatenate(weights)
+        avg_weights = avg_weights * ((fold_no - 1) / (fold_no)) + weights / (fold_no)
+        #print(f"\n\nCOEFFICIENTS:\n{weights}\n AVG: {avg_weights}\n")
 
+        intercept = logreg_lambda_10.intercept_
+        intercept = np.array(intercept)
+        avg_intercept = avg_intercept * ((fold_no - 1) / (fold_no)) + intercept / (fold_no)
+        #print(f"\n\nINTERCEPT:\n{intercept} AVG: {avg_intercept}\n")
+        
         ###########################
         ########### KNN ###########
         ###########################
@@ -241,9 +312,9 @@ def run(X, df, classLabels, np, pd, plt):
 
         # Distance metric (corresponds to 2nd norm, euclidean distance).
         # You can set dist=1 to obtain manhattan distance (cityblock distance).
-        dist=2
-        metric = 'minkowski'
-        metric_params = {} # no parameters needed for minkowski
+        # dist=2
+        # metric = 'minkowski'
+        # metric_params = {} # no parameters needed for minkowski
 
         knn_classifier, knn_num = get_best_knn_classifier(data_train, label_train, internal_cross_validation, X_bin, classLabels)
         
@@ -256,6 +327,7 @@ def run(X, df, classLabels, np, pd, plt):
         knn_y_est = knn_classifier.predict(data_test)
         test_error_rate_knn = np.sum(knn_y_est!=label_test) / len(label_test)
 
+        mcnemar_yhat_knn.append(knn_y_est)
 
         # # Compute and plot confusion matrix
         # cm = confusion_matrix(label_test, knn_y_est)
@@ -273,11 +345,63 @@ def run(X, df, classLabels, np, pd, plt):
 
         print(f'{fold_no}\t| {test_error_rate_basel*100:.2f}%\t| {lambda_lr:.5f}\t{test_error_rate_regr*100:.2f}%\t\t| {knn_num}\t\t{test_error_rate_knn*100:.2f}%\t| {len(label_test)}')
         
-
+        mcnemar_y_test.append(label_test)
         fold_no += 1
         
     dummy_err_avg /= K
     lin_reg_err_avg /= K
     knn_err_avg /= K
 
-    print(f'GEN. ERR\t| {dummy_err_avg*100:.2f}\t\t|\t\t{lin_reg_err_avg*100:.2f}\t\t|\t\t\t{knn_err_avg*100:.2f}')
+    print(f'GEN. ERR\t| {dummy_err_avg*100:.2f}\t\t|\t\t{lin_reg_err_avg*100:.2f}\t\t|\t\t\t{knn_err_avg*100:.2f}\n')
+    
+    print("##################################\n")
+    print("\n\n########## MCNEMAR TEST ##########\n")
+    mcnemar_y_test = np.concatenate(mcnemar_y_test)
+    mcnemar_yhat_baseline = np.concatenate(mcnemar_yhat_baseline)
+    mcnemar_yhat_linreg = np.concatenate(mcnemar_yhat_linreg)
+    mcnemar_yhat_knn = np.concatenate(mcnemar_yhat_knn)
+
+    print("\n-----------------")
+    print("Baseline vs linreg\n")
+    alpha = 0.05
+    [thetahat, CI, p] = mcnemar(mcnemar_y_test, mcnemar_yhat_baseline, mcnemar_yhat_linreg, alpha=alpha)
+
+    print("\n-----------------")
+    print("Baseline vs KNN\n")
+    alpha = 0.05
+    [thetahat, CI, p] = mcnemar(mcnemar_y_test, mcnemar_yhat_baseline, mcnemar_yhat_knn, alpha=alpha)
+
+    print("\n-----------------")
+    print("KNN vs linreg\n")
+    alpha = 0.05
+    [thetahat, CI, p] = mcnemar(mcnemar_y_test, mcnemar_yhat_knn, mcnemar_yhat_linreg, alpha=alpha)
+    
+    
+    
+    print(f"\n\nAVG. COEFFICIENTS: {avg_weights}")
+    print(f"\n\nAVG. INTERCEPT: {avg_intercept}")
+    
+    
+    print(f"Printing confussion matrix...")
+    yhat_linreg_lambd_10 = np.concatenate(yhat_linreg_lambd_10)
+    cm = confusion_matrix(yhat_linreg_lambd_10, mcnemar_y_test)
+    accuracy = 100*cm.diagonal().sum()/cm.sum(); error_rate = 100-accuracy;
+    cax = plt.matshow(cm, cmap=plt.cm.Blues)
+    plt.colorbar(cax)
+    
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            plt.text(j, i, str(cm[i, j]), ha='center', va='center', fontsize=24, color='black')
+    #plt.figure(2);
+    #plt.imshow(cm, cmap='binary', interpolation='None');
+    # plt.colorbar()
+    plt.xticks(range(2)); plt.yticks(range(2));
+    plt.xlabel('Predicted class'); plt.ylabel('Actual class');
+    plt.title(f"Confusion matrix (Accuracy: {accuracy:.2f}%, Error Rate: {error_rate:.2f}%");
+    
+    
+    print("\n\n#################################")
+    print("##### END OF CLASSIFICATION #####")
+    print("#################################\n")
+
+

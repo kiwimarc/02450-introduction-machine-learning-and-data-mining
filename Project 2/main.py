@@ -10,7 +10,7 @@ import classification_v2
 
 # If set to true, then plots will be shown. Scripts stops after showing the plot, thats when
 # this variable may come in handy.
-SHOW_PLOTS = False
+SHOW_PLOTS = True
 
 #################################
 #                               #
