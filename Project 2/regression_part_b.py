@@ -19,7 +19,14 @@ def run(X, df, np, pd, plt):
 
 
     # Define the range of hidden units
-    hidden_units = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    hidden_units = [1, 5, 10, 15, 20, 25, 30, 35, 40, 80, 120]
+    K=10 #no. of folds
+    y = df['aac'] 
+
+    # Assuming 'n' is the number of features in your dataset
+    n = X.shape[1] 
+    mu = np.empty((K, n-1))
+    sigma = np.empty((K, n-1))
 
     CV = model_selection.KFold(K, shuffle=True)
 
