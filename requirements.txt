@@ -29,7 +29,7 @@ nvidia-nvjitlink-cu12==12.3.52
 nvidia-nvtx-cu12==12.1.105
 packaging==23.2
 pandas==2.1.2
-Pillow==10.1.0
+Pillow==10.2.0
 pyparsing==3.1.1
 python-dateutil==2.8.2
 pytz==2023.3.post1
